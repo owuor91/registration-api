@@ -23,8 +23,13 @@ class Student(Resource):
                                        date_of_birth=datetime.datetime.strptime(self.get_value('date_of_birth'),
                                                                                 '%Y-%m-%d'),
                                        sex=self.get_value('sex'))
-            new_student.save_to_db()
-            return {'message': 'student registration, successful'}, 201
+            try:
+                new_student.save_to_db()
+                saved_student = StudentModel.find_student_by_phone_number(request_phone_number)
+                return {'message': 'student registration, successful',
+                        'student': saved_student.to_json()}, 201
+            except Exception as e:
+                return {'error': e.message}, 500
 
     def validate_post_student(self):
         errors = dict()
