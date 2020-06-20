@@ -1,13 +1,12 @@
-import os
-
 from flask import Flask
 from flask_restful import Api
 
+from config import DevelopmentConfig
 from db import db
 from resources.student import Student
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///registration.db')
+app.config.from_object(DevelopmentConfig)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 api = Api(app)
