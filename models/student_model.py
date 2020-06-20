@@ -29,15 +29,16 @@ class StudentModel(Base):
 
     @classmethod
     def find_student_by_id(cls, student_id):
-        return cls.query.filter_by(id=student_id).first()
+        return db.session.query(StudentModel).filter(StudentModel.id == student_id).filter(
+            StudentModel.active == True).first()
 
     @classmethod
     def return_all(cls):
-        return cls.query.all()
+        return db.session.query(StudentModel).filter(StudentModel.active == True).all()
 
     @classmethod
     def find_student_by_phone_number(cls, _phone_number):
-        return cls.query.filter_by(phone_number=_phone_number).first()
+        return db.session.query(StudentModel).filter(StudentModel.phone_number == _phone_number).first()
 
     def save_to_db(self):
         db.session.add(self)

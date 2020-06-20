@@ -87,5 +87,14 @@ class Student(Resource):
         return {'message': 'student updated successfully',
                 'student': student.to_json()}
 
+    def delete(self, student_id):
+        student = StudentModel.find_student_by_id(student_id)
+        if student:
+            student.active = False
+            student.save_to_db()
+            return {'message': 'student deleted successfully'}
+        else:
+            return {'message': 'student with id {} doesn\'t exist'.format(student_id)}
+
     def get_value(self, string):
         return request.form.get(string)
