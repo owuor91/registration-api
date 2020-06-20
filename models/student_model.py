@@ -1,9 +1,13 @@
 import datetime
 
+from sqlalchemy.ext.declarative import declarative_base
+
 from db import db
 
+Base = declarative_base()
 
-class StudentModel(db.Model):
+
+class StudentModel(Base):
     __tablename__ = 'students'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -13,6 +17,7 @@ class StudentModel(db.Model):
     phone_number = db.Column(db.String(50), nullable=False)
     date_of_birth = db.Column(db.DateTime, nullable=False)
     sex = db.Column(db.String(20), nullable=False)
+    active = db.Column(db.Boolean, default=True)
 
     def __init__(self, first_name, last_name, email, phone_number, date_of_birth, sex):
         self.first_name = first_name
