@@ -58,5 +58,27 @@ class Student(Resource):
             return {'students': [s.to_json() for s in students]}
         return {'message': 'student not found'}, 404
 
+    def put(self, student_id):
+        student = StudentModel.find_student_by_id(student_id)
+
+        if not student:
+            return {'error': 'Student with id {} not found'.format(student_id)}
+
+        if self.get_value('first_name'):
+            student.first_name = self.get_value('first_name')
+
+        if self.get_value('last_name'):
+            student.last_name = self.get_value('last_name')
+
+        if self.get_value('email'):
+            student.email = self.get_value('email')
+
+        if self.get_value('phone_number'):
+            student.phone_number = self.get_value('phone_number')
+
+        student.save_to_db()
+        return {'message': 'student updated successfully',
+                'student': student.to_json()}
+
     def get_value(self, string):
         return request.form.get(string)
