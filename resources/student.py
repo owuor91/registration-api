@@ -8,6 +8,28 @@ from models.student_model import StudentModel
 
 class Student(Resource):
     def post(self):
+        errors = dict()
+        if not self.get_value('first_name'):
+            errors['first_name'] = 'First name is required'
+
+        if not self.get_value('last_name'):
+            errors['last_name'] = 'Last name is required'
+
+        if not self.get_value('date_of_birth'):
+            errors['date_of_birth'] = 'date_of_birth is required'
+
+        if not self.get_value('email'):
+            errors['email'] = 'email is required'
+
+        if not self.get_value('phone_number'):
+            errors['phone_number'] = 'phone_number is required'
+
+        if not self.get_value('sex'):
+            errors['sex'] = 'sex is required'
+
+        if (len(errors) != 0):
+            return {'error': True, 'errors': errors}, 400
+
         request_phone_number = self.get_value('phone_number')
 
         if StudentModel.find_student_by_phone_number(request_phone_number):
