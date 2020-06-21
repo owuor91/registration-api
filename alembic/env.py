@@ -5,7 +5,7 @@ from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
 sys.path = ['', '..'] + sys.path[1:]
-from models import student_model
+from models import student_model, course_model
 
 from alembic import context
 
@@ -21,7 +21,7 @@ fileConfig(config.config_file_name)
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-target_metadata = [student_model.Base.metadata]
+target_metadata = [student_model.Base.metadata, course_model.Base.metadata]
 
 
 # other values from the config, defined by the needs of env.py,
