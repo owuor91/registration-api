@@ -3,6 +3,7 @@ import uuid
 
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import relationship
 
 from db import db
 
@@ -20,6 +21,8 @@ class StudentModel(Base):
     date_of_birth = db.Column(db.DateTime, nullable=False)
     sex = db.Column(db.String(20), nullable=False)
     active = db.Column(db.Boolean, default=True)
+
+    courses = relationship('CourseModel', secondary='student_courses')
 
     def __init__(self, first_name, last_name, email, phone_number, date_of_birth, sex):
         self.first_name = first_name
@@ -41,6 +44,10 @@ class StudentModel(Base):
     @classmethod
     def find_student_by_phone_number(cls, _phone_number):
         return db.session.query(StudentModel).filter(StudentModel.phone_number == _phone_number).first()
+
+    @classmethod
+    def find_student_courses(cls, student_id):
+        return cls.find_student_by_id(student_id).courses
 
     def save_to_db(self):
         db.session.add(self)
