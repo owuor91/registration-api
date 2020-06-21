@@ -1,6 +1,5 @@
 import uuid
 
-from flask import jsonify
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -43,4 +42,10 @@ class CourseModel(Base):
         db.session.commit()
 
     def to_json(self):
-        return jsonify(self)
+        return {
+            'id': str(self.id),
+            'name': self.name,
+            'code': self.code,
+            'description': self.description,
+            'instructor': self.instructor
+        }

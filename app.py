@@ -3,6 +3,7 @@ from flask_restful import Api
 
 from config import DevelopmentConfig
 from db import db
+from resources.course import Course
 from resources.student import Student
 
 app = Flask(__name__)
@@ -20,6 +21,7 @@ def create_tables():
 
 
 api.add_resource(Student, '/students', '/students/<int:student_id>')
+api.add_resource(Course, '/courses', '/courses/<uuid:course_id>')
 
 if __name__ == '__main__':
     app.run(port=5000, debug=True)
