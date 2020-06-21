@@ -7,10 +7,10 @@ from utils.util import get_value
 class Course(Resource):
     def validate_post_course(self):
         errors = dict()
-        if not get_value('name'):
-            errors['name'] = 'name is required'
-        if not get_value('code'):
-            errors['code'] = 'code is required'
+        if not get_value('course_name'):
+            errors['course_name'] = 'course_name is required'
+        if not get_value('course_code'):
+            errors['course_code'] = 'course_code is required'
         if not get_value('description'):
             errors['description'] = 'description is required'
         if not get_value('instructor'):
@@ -23,14 +23,14 @@ class Course(Resource):
         if (len(errors) != 0):
             return {'error': True, 'errors': errors}, 400
 
-        if CourseModel.find_course_by_code(get_value('code')):
-            return {'message': 'a course with the code {} already exists'.format(get_value('code'))}, 400
+        if CourseModel.find_course_by_code(get_value('course_code')):
+            return {'message': 'a course with the code {} already exists'.format(get_value('course_code'))}, 400
         else:
-            new_course = CourseModel(name=get_value('name'), code=get_value('code'),
+            new_course = CourseModel(course_name=get_value('course_name'), course_code=get_value('course_code'),
                                      description=get_value('description'), instructor=get_value('instructor'))
             try:
                 new_course.save_to_db()
-                saved_course = CourseModel.find_course_by_code(get_value('code'))
+                saved_course = CourseModel.find_course_by_code(get_value('course_code'))
                 return {'message': 'course added successfully',
                         'course': saved_course.to_json()}, 201
             except Exception as e:

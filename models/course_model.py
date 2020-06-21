@@ -10,27 +10,27 @@ Base = declarative_base()
 
 class CourseModel(Base):
     __tablename__ = 'courses'
-    id = db.Column(UUID(as_uuid=True), default=uuid.uuid4, primary_key=True, nullable=False)
-    name = db.Column(db.String(50), nullable=False)
-    code = db.Column(db.String(30), nullable=False)
+    course_id = db.Column(UUID(as_uuid=True), default=uuid.uuid4, primary_key=True, nullable=False)
+    course_name = db.Column(db.String(50), nullable=False)
+    course_code = db.Column(db.String(30), nullable=False)
     description = db.Column(db.String(256))
     instructor = db.Column(db.String(50), nullable=False)
     active = db.Column(db.Boolean, default=True)
 
-    def __init__(self, name, code, description, instructor):
-        self.name = name
-        self.code = code
+    def __init__(self, course_name, course_code, description, instructor):
+        self.course_name = course_name
+        self.course_code = course_code
         self.description = description
         self.instructor = instructor
 
     @classmethod
     def find_course_by_id(cls, course_id):
-        return db.session.query(CourseModel).filter(CourseModel.id == course_id).filter(
+        return db.session.query(CourseModel).filter(CourseModel.course_id == course_id).filter(
             CourseModel.active == True).first()
 
     @classmethod
     def find_course_by_code(cls, course_code):
-        return db.session.query(CourseModel).filter(CourseModel.code == course_code).filter(
+        return db.session.query(CourseModel).filter(CourseModel.course_code == course_code).filter(
             CourseModel.active == True).first()
 
     @classmethod
@@ -43,9 +43,9 @@ class CourseModel(Base):
 
     def to_json(self):
         return {
-            'id': str(self.id),
-            'name': self.name,
-            'code': self.code,
+            'course_id': str(self.course_id),
+            'course_name': self.course_name,
+            'course_code': self.course_code,
             'description': self.description,
             'instructor': self.instructor
         }

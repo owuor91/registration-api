@@ -1,5 +1,7 @@
 import datetime
+import uuid
 
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.declarative import declarative_base
 
 from db import db
@@ -10,7 +12,7 @@ Base = declarative_base()
 class StudentModel(Base):
     __tablename__ = 'students'
 
-    id = db.Column(db.Integer, primary_key=True)
+    student_id = db.Column(UUID(as_uuid=True), default=uuid.uuid4, primary_key=True, nullable=False)
     first_name = db.Column(db.String(50), nullable=False)
     last_name = db.Column(db.String(50), nullable=False)
     email = db.Column(db.String(50), nullable=False)
@@ -29,7 +31,7 @@ class StudentModel(Base):
 
     @classmethod
     def find_student_by_id(cls, student_id):
-        return db.session.query(StudentModel).filter(StudentModel.id == student_id).filter(
+        return db.session.query(StudentModel).filter(StudentModel.student_id == student_id).filter(
             StudentModel.active == True).first()
 
     @classmethod
@@ -45,7 +47,7 @@ class StudentModel(Base):
         db.session.commit()
 
     def to_json(self):
-        return {"id": self.id,
+        return {"student_id": self.student_id,
                 "first_name": self.first_name,
                 "last_name": self.last_name,
                 "email": self.email,
