@@ -97,7 +97,7 @@ class Student(Resource):
         if student:
             student.active = False
             student.save_to_db()
-            return {'message': 'student deleted successfully'}
+            return {'message': 'student deleted successfully'}, 204
         else:
             return {'message': 'student with id {} doesn\'t exist'.format(student_id)}
 

@@ -23,6 +23,7 @@ def upgrade():
         sa.Column('last_name', sa.String(), nullable=False),
         sa.Column('email', sa.String(), nullable=False),
         sa.Column('phone_number', sa.String(), nullable=False),
+        sa.Column('date_of_birth', sa.DateTime(), nullable=False),
         sa.Column('sex', sa.String(), nullable=False)
     )
 
