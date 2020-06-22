@@ -47,7 +47,7 @@ class StudentModel(Base):
         db.session.commit()
 
     def to_json(self):
-        return {"student_id": self.student_id,
+        return {"student_id": str(self.student_id),
                 "first_name": self.first_name,
                 "last_name": self.last_name,
                 "email": self.email,
