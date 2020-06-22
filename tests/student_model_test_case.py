@@ -1,10 +1,10 @@
-import json
 import unittest
 
 from sqlalchemy.sql import text
 
 from app import create_app, db
 from config import TestingConfig
+from utils.util import decode_response_to_json
 
 
 class StudentModelTestCase(unittest.TestCase):
@@ -24,7 +24,8 @@ class StudentModelTestCase(unittest.TestCase):
 
         with self.app.app_context():
             db.create_all()
-            db.engine.execute(text('DELETE FROM students'))
+            db.session.execute(text('DELETE FROM students'))
+            db.session.commit()
 
     def test_student_creation(self):
         """Test API can create student"""
@@ -43,21 +44,21 @@ class StudentModelTestCase(unittest.TestCase):
         """Test fetching all students"""
         self.client.post('/students', data=self.student)
         response = self.client.get('/students')
-        json_response = self.decode_response_to_json(response)
+        json_response = decode_response_to_json(response)
         self.assertEqual(response.status_code, 200)
         self.assertTrue(len(json_response['students']) == 1)
 
     def test_fetch_student_by_id(self):
         """test fetching student by id"""
         result = self.client.post('/students', data=self.student)
-        json_result = self.decode_response_to_json(result)
+        json_result = decode_response_to_json(result)
         response = self.client.get('/students/{}'.format(json_result['student']['student_id']))
         self.assertEqual(response.status_code, 200)
 
     def test_deleting_student(self):
         """test deleting student"""
         result = self.client.post('/students', data=self.student)
-        json_result = self.decode_response_to_json(result)
+        json_result = decode_response_to_json(result)
         student_id = json_result['student']['student_id']
         response = self.client.delete('/students/{}'.format(student_id))
         self.assertEqual(response.status_code, 204)
@@ -67,17 +68,17 @@ class StudentModelTestCase(unittest.TestCase):
     def test_editing_student(self):
         """test editing student"""
         result = self.client.post('/students', data=self.student)
-        json_result = self.decode_response_to_json(result)
+        json_result = decode_response_to_json(result)
         student_id = json_result['student']['student_id']
         response = self.client.put('/students/{}'.format(student_id), data={'first_name': 'Wanjala'})
         fetch_response = self.client.get('/students/{}'.format(student_id))
-        json_fetch_response = self.decode_response_to_json(fetch_response)
+        json_fetch_response = decode_response_to_json(fetch_response)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(json_fetch_response['student']['first_name'], 'Wanjala')
 
     def test_missing_fields(self):
         result = self.client.post('/students', data={})
-        json_result = self.decode_response_to_json(result)
+        json_result = decode_response_to_json(result)
         self.assertEqual(result.status_code, 400)
         self.assertEqual(json_result['errors']['first_name'], 'First name is required')
 
@@ -86,9 +87,6 @@ class StudentModelTestCase(unittest.TestCase):
         with self.app.app_context():
             db.session.remove()
             db.drop_all()
-
-    def decode_response_to_json(self, response):
-        return json.loads(response.data.decode('utf-8').replace("'", "\""))
 
 
 if __name__ == '__main__':
