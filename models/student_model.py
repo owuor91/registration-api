@@ -20,14 +20,16 @@ class StudentModel(Base):
     date_of_birth = db.Column(db.DateTime, nullable=False)
     sex = db.Column(db.String(20), nullable=False)
     active = db.Column(db.Boolean, default=True)
+    image_url = db.Column(db.String(256))
 
-    def __init__(self, first_name, last_name, email, phone_number, date_of_birth, sex):
+    def __init__(self, first_name, last_name, email, phone_number, date_of_birth, sex, image_url):
         self.first_name = first_name
         self.last_name = last_name
         self.email = email
         self.phone_number = phone_number
         self.date_of_birth = date_of_birth
         self.sex = sex
+        self.image_url = image_url
 
     @classmethod
     def find_student_by_id(cls, student_id):
@@ -53,4 +55,5 @@ class StudentModel(Base):
                 "email": self.email,
                 "phone_number": self.phone_number,
                 "date_of_birth": datetime.datetime.strftime(self.date_of_birth, '%Y-%m-%d'),
-                "sex": self.sex}
+                "sex": self.sex,
+                "image_url": self.image_url}
