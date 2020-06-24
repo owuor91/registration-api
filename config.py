@@ -13,6 +13,10 @@ class Config(object):
     CSRF_ENABLED = True
     SECRET_KEY = getenv('SECRET_KEY')
     SQLALCHEMY_DATABASE_URI = getenv('DATABASE_URL')
+    S3_BUCKET_NAME = getenv('S3_BUCKET_NAME')
+    S3_ACCESS_KEY = getenv('S3_ACCESS_KEY')
+    S3_SECRET_ACCESS_KEY = getenv('S3_SECRET_ACCESS_KEY')
+    S3_BASE_URL = getenv('S3_BASE_URL')
 
 
 class ProductionConfig(Config):

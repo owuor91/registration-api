@@ -1,8 +1,11 @@
 import datetime
 
+import boto3
 from flask import request
 from flask_restful import Resource
+from werkzeug.utils import secure_filename
 
+from config import Config
 from models.student_model import StudentModel
 
 
@@ -16,13 +19,22 @@ class Student(Resource):
         if StudentModel.find_student_by_phone_number(request_phone_number):
             return {'message': 'a student with the number {} already exists'.format(request_phone_number)}, 400
         else:
+            image_file = request.files['image']
+            image_url = ""
+            if image_file:
+                try:
+                    image_url = self.upload_image_to_s3(image_file)
+                except Exception as e:
+                    return {'error': True, 'errors': e.args}, 400
+
             new_student = StudentModel(first_name=self.get_value('first_name'),
                                        last_name=self.get_value('last_name'),
                                        email=self.get_value('email'),
                                        phone_number=self.get_value('phone_number'),
                                        date_of_birth=datetime.datetime.strptime(self.get_value('date_of_birth'),
                                                                                 '%Y-%m-%d'),
-                                       sex=self.get_value('sex'))
+                                       sex=self.get_value('sex'),
+                                       image_url=image_url)
             try:
                 new_student.save_to_db()
                 saved_student = StudentModel.find_student_by_phone_number(request_phone_number)
@@ -103,3 +115,23 @@ class Student(Resource):
 
     def get_value(self, string):
         return request.form.get(string)
+
+    def upload_image_to_s3(self, image_file):
+        img_file_name = secure_filename(image_file.filename)
+
+        image_errors = dict()
+
+        allowed_extensions = ['jpg', 'jpeg', 'png', 'gif']
+        if '.' not in img_file_name or img_file_name.split('.')[1].lower() not in allowed_extensions:
+            image_errors['message'] = 'image file format is not supported'
+            raise Exception(image_errors)
+
+        s3 = boto3.client("s3", aws_access_key_id=Config.S3_ACCESS_KEY,
+                          aws_secret_access_key=Config.S3_SECRET_ACCESS_KEY)
+        try:
+            file_path = '{}{}'.format('pictures/', img_file_name)
+            s3.upload_fileobj(image_file, Config.S3_BUCKET_NAME, file_path)
+            return '{}{}'.format(Config.S3_BASE_URL, img_file_name)
+        except Exception as e:
+            image_errors['message'] = str(e.args)
+            raise Exception(image_errors)
