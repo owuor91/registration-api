@@ -1,6 +1,6 @@
 from flask_restful import Resource
 
-from models.course_model import CourseModel
+from models.models import CourseModel
 from utils.util import get_value
 
 

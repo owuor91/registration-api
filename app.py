@@ -5,6 +5,7 @@ from config import DevelopmentConfig
 from db import db
 from resources.course import Course
 from resources.student import Student
+from resources.student_course import StudentCourse
 
 
 def create_app(config):
@@ -19,7 +20,10 @@ def create_app(config):
 
     api.add_resource(Student, '/students', '/students/<uuid:student_id>')
     api.add_resource(Course, '/courses', '/courses/<uuid:course_id>')
+    api.add_resource(StudentCourse, '/register-course', '/students/<uuid:student_id>/courses',
+                     '/courses/<uuid:course_id>/students')
     return app
+
 
 if __name__ == '__main__':
     create_app(DevelopmentConfig).run(port=5000, debug=True)
