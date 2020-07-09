@@ -3,18 +3,11 @@ import uuid
 
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import relationship
 
 from db import db
 
 Base = declarative_base()
-
-
-# class StudentCourse(Base):
-#     __tablename__ = 'student_courses'
-#     student_id = db.Column(UUID(as_uuid=True), db.ForeignKey('students.student_id'), primary_key=True)
-#     course_id = db.Column(UUID(as_uuid=True), db.ForeignKey('courses.course_id'), primary_key=True)
-#     course = db.relationship("CoursesModel")
-
 
 class StudentModel(Base):
     __tablename__ = 'students'
@@ -28,6 +21,7 @@ class StudentModel(Base):
     sex = db.Column(db.String(20), nullable=False)
     active = db.Column(db.Boolean, default=True)
     image_url = db.Column(db.String(256))
+    courses = relationship('CourseModel', secondary='student_courses')
 
     def __init__(self, first_name, last_name, email, phone_number, date_of_birth, sex, image_url):
         self.first_name = first_name
@@ -74,6 +68,7 @@ class CourseModel(Base):
     description = db.Column(db.String(256))
     instructor = db.Column(db.String(50), nullable=False)
     active = db.Column(db.Boolean, default=True)
+    students = relationship(StudentModel, secondary='student_courses')
 
     def __init__(self, course_name, course_code, description, instructor):
         self.course_name = course_name
@@ -107,3 +102,9 @@ class CourseModel(Base):
             'description': self.description,
             'instructor': self.instructor
         }
+
+
+class StudentCourse(Base):
+    __tablename__ = 'student_courses'
+    student_id = db.Column(UUID(as_uuid=True), db.ForeignKey('students.student_id'), primary_key=True)
+    course_id = db.Column(UUID(as_uuid=True), db.ForeignKey('courses.course_id'), primary_key=True)
