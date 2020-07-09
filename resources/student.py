@@ -6,7 +6,7 @@ from flask_restful import Resource
 from werkzeug.utils import secure_filename
 
 from config import Config
-from models.student_model import StudentModel
+from models.models import StudentModel
 from utils.util import get_value
 
 
