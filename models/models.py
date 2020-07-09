@@ -9,6 +9,7 @@ from db import db
 
 Base = declarative_base()
 
+
 class StudentModel(Base):
     __tablename__ = 'students'
 
@@ -57,7 +58,8 @@ class StudentModel(Base):
                 "phone_number": self.phone_number,
                 "date_of_birth": datetime.datetime.strftime(self.date_of_birth, '%Y-%m-%d'),
                 "sex": self.sex,
-                "image_url": self.image_url}
+                "image_url": self.image_url,
+                "courses": [x.to_json() for x in self.courses]}
 
 
 class CourseModel(Base):
@@ -104,7 +106,31 @@ class CourseModel(Base):
         }
 
 
-class StudentCourse(Base):
+class StudentCourseModel(Base):
     __tablename__ = 'student_courses'
     student_id = db.Column(UUID(as_uuid=True), db.ForeignKey('students.student_id'), primary_key=True)
     course_id = db.Column(UUID(as_uuid=True), db.ForeignKey('courses.course_id'), primary_key=True)
+
+    def __init__(self, student_id, course_id):
+        self.student_id = student_id
+        self.course_id = course_id
+
+    def save_to_db(self):
+        db.session.add(self)
+        db.session.commit()
+
+    @classmethod
+    def find_student_courses(cls, student_id):
+        return db.session.query(StudentCourseModel).filter(StudentCourseModel.student_id == student_id).all()
+
+    def to_json(self):
+        return {
+            'course_id': str(self.course_id),
+            'student_id': str(self.student_id)
+        }
+
+    @classmethod
+    def find_record(cls, student_id, course_id):
+        return db.session.query(StudentCourseModel).filter(StudentCourseModel.student_id == student_id).filter(
+            StudentCourseModel.course_id == course_id).filter(
+            CourseModel.active == True).first()
