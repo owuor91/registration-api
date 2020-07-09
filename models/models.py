@@ -1,6 +1,7 @@
 import datetime
 import uuid
 
+from sqlalchemy import or_
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
@@ -22,7 +23,7 @@ class StudentModel(Base):
     sex = db.Column(db.String(20), nullable=False)
     active = db.Column(db.Boolean, default=True)
     image_url = db.Column(db.String(256))
-    courses = relationship('CourseModel', secondary='student_courses')
+    courses = relationship('CourseModel', secondary='student_courses', back_populates='students')
 
     def __init__(self, first_name, last_name, email, phone_number, date_of_birth, sex, image_url):
         self.first_name = first_name
@@ -70,7 +71,7 @@ class CourseModel(Base):
     description = db.Column(db.String(256))
     instructor = db.Column(db.String(50), nullable=False)
     active = db.Column(db.Boolean, default=True)
-    students = relationship(StudentModel, secondary='student_courses')
+    students = relationship('StudentModel', secondary='student_courses', back_populates='courses')
 
     def __init__(self, course_name, course_code, description, instructor):
         self.course_name = course_name
@@ -120,8 +121,9 @@ class StudentCourseModel(Base):
         db.session.commit()
 
     @classmethod
-    def find_student_courses(cls, student_id):
-        return db.session.query(StudentCourseModel).filter(StudentCourseModel.student_id == student_id).all()
+    def find_student_courses(cls, student_id=None, course_id=None):
+        return db.session.query(StudentCourseModel).filter(
+            or_(StudentCourseModel.student_id == student_id, StudentCourseModel.course_id == course_id)).all()
 
     def to_json(self):
         return {

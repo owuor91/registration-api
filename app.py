@@ -20,8 +20,10 @@ def create_app(config):
 
     api.add_resource(Student, '/students', '/students/<uuid:student_id>')
     api.add_resource(Course, '/courses', '/courses/<uuid:course_id>')
-    api.add_resource(StudentCourse, '/register-course', '/students/<uuid:student_id>/courses')
+    api.add_resource(StudentCourse, '/register-course', '/students/<uuid:student_id>/courses',
+                     '/courses/<uuid:course_id>/students')
     return app
+
 
 if __name__ == '__main__':
     create_app(DevelopmentConfig).run(port=5000, debug=True)
