@@ -1,11 +1,36 @@
+import graphene
 from flask import Flask
+from flask_graphql import GraphQLView
 from flask_restful import Api
+from graphene_sqlalchemy import SQLAlchemyObjectType, SQLAlchemyConnectionField
 
 from config import DevelopmentConfig
 from db import db
+from models.models import StudentModel, CourseModel
 from resources.course import Course
 from resources.student import Student
 from resources.student_course import StudentCourse
+
+
+class StudentObject(SQLAlchemyObjectType):
+    class Meta:
+        model = StudentModel
+        interfaces = (graphene.relay.Node,)
+
+
+class CourseObject(SQLAlchemyObjectType):
+    class Meta:
+        model = CourseModel
+        interfaces = (graphene.relay.Node,)
+
+
+class Query(graphene.ObjectType):
+    node = graphene.relay.Node.Field()
+    students = SQLAlchemyConnectionField(StudentObject)
+    courses = SQLAlchemyConnectionField(CourseObject)
+
+
+schema = graphene.Schema(query=Query, auto_camelcase=False)
 
 
 def create_app(config):
@@ -22,6 +47,9 @@ def create_app(config):
     api.add_resource(Course, '/courses', '/courses/<uuid:course_id>')
     api.add_resource(StudentCourse, '/register-course', '/students/<uuid:student_id>/courses',
                      '/courses/<uuid:course_id>/students')
+
+    app.add_url_rule('/graphql', view_func=GraphQLView.as_view('graphql', schema=schema, graphiql=True,
+                                                               get_context=lambda: {'session': db.session}))
     return app
 
 
