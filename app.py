@@ -1,36 +1,13 @@
-import graphene
 from flask import Flask
 from flask_graphql import GraphQLView
 from flask_restful import Api
-from graphene_sqlalchemy import SQLAlchemyObjectType, SQLAlchemyConnectionField
 
 from config import DevelopmentConfig
 from db import db
-from models.models import StudentModel, CourseModel
+from gql import schema
 from resources.course import Course
 from resources.student import Student
 from resources.student_course import StudentCourse
-
-
-class StudentObject(SQLAlchemyObjectType):
-    class Meta:
-        model = StudentModel
-        interfaces = (graphene.relay.Node,)
-
-
-class CourseObject(SQLAlchemyObjectType):
-    class Meta:
-        model = CourseModel
-        interfaces = (graphene.relay.Node,)
-
-
-class Query(graphene.ObjectType):
-    node = graphene.relay.Node.Field()
-    students = SQLAlchemyConnectionField(StudentObject)
-    courses = SQLAlchemyConnectionField(CourseObject)
-
-
-schema = graphene.Schema(query=Query, auto_camelcase=False)
 
 
 def create_app(config):
