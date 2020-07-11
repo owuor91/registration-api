@@ -68,7 +68,7 @@ class StudentModel(Base):
             }
             return jwt.encode(payload=payload, key=current_app.config.get('SECRET_KEY'), algorithm='HS256')
         except Exception as e:
-            return str(e)
+            raise Exception(e)
 
     @staticmethod
     def decode_token(token):
