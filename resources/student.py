@@ -7,12 +7,15 @@ from werkzeug.utils import secure_filename
 
 from config import Config
 from models.models import StudentModel
+from schemas.schema import StudentSchema
 from utils.util import get_value
 
 
 class Student(Resource):
     def post(self, image=None):
-        errors = self.validate_post_student()
+        student_schema = StudentSchema()
+        data = request.get_json()
+        errors = student_schema.validate(data=data)
         if (len(errors) != 0):
             return {'error': True, 'errors': errors}, 400
         request_phone_number = get_value('phone_number')
