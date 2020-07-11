@@ -1,4 +1,3 @@
-import datetime
 import uuid
 
 from sqlalchemy import or_
@@ -51,17 +50,6 @@ class StudentModel(Base):
         db.session.add(self)
         db.session.commit()
 
-    def to_json(self):
-        return {"student_id": str(self.student_id),
-                "first_name": self.first_name,
-                "last_name": self.last_name,
-                "email": self.email,
-                "phone_number": self.phone_number,
-                "date_of_birth": datetime.datetime.strftime(self.date_of_birth, '%Y-%m-%d'),
-                "sex": self.sex,
-                "image_url": self.image_url,
-                "courses": [x.to_json() for x in self.courses]}
-
 
 class CourseModel(Base):
     __tablename__ = 'courses'
@@ -97,15 +85,6 @@ class CourseModel(Base):
         db.session.add(self)
         db.session.commit()
 
-    def to_json(self):
-        return {
-            'course_id': str(self.course_id),
-            'course_name': self.course_name,
-            'course_code': self.course_code,
-            'description': self.description,
-            'instructor': self.instructor
-        }
-
 
 class StudentCourseModel(Base):
     __tablename__ = 'student_courses'
@@ -124,12 +103,6 @@ class StudentCourseModel(Base):
     def find_student_courses(cls, student_id=None, course_id=None):
         return db.session.query(StudentCourseModel).filter(
             or_(StudentCourseModel.student_id == student_id, StudentCourseModel.course_id == course_id)).all()
-
-    def to_json(self):
-        return {
-            'course_id': str(self.course_id),
-            'student_id': str(self.student_id)
-        }
 
     @classmethod
     def find_record(cls, student_id, course_id):
