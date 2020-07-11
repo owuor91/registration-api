@@ -1,5 +1,9 @@
 import uuid
+from datetime import datetime, timedelta
 
+import jwt
+from flask import current_app
+from flask_bcrypt import Bcrypt
 from sqlalchemy import or_
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.declarative import declarative_base
@@ -16,15 +20,16 @@ class StudentModel(Base):
     student_id = db.Column(UUID(as_uuid=True), default=uuid.uuid4, primary_key=True, nullable=False)
     first_name = db.Column(db.String(50), nullable=False)
     last_name = db.Column(db.String(50), nullable=False)
-    email = db.Column(db.String(50), nullable=False)
-    phone_number = db.Column(db.String(50), nullable=False)
+    email = db.Column(db.String(50), nullable=False, unique=True)
+    phone_number = db.Column(db.String(50), nullable=False, unique=True)
     date_of_birth = db.Column(db.DateTime, nullable=False)
     sex = db.Column(db.String(20), nullable=False)
     active = db.Column(db.Boolean, default=True)
     image_url = db.Column(db.String(256))
+    password = db.Column(db.String(256), nullable=False)
     courses = relationship('CourseModel', secondary='student_courses', back_populates='students')
 
-    def __init__(self, first_name, last_name, email, phone_number, date_of_birth, sex, image_url):
+    def __init__(self, first_name, last_name, email, phone_number, date_of_birth, sex, image_url, password):
         self.first_name = first_name
         self.last_name = last_name
         self.email = email
@@ -32,6 +37,7 @@ class StudentModel(Base):
         self.date_of_birth = date_of_birth
         self.sex = sex
         self.image_url = image_url
+        self.password = Bcrypt().generate_password_hash(password).decode()
 
     @classmethod
     def find_student_by_id(cls, student_id):
@@ -45,6 +51,34 @@ class StudentModel(Base):
     @classmethod
     def find_student_by_phone_number(cls, _phone_number):
         return db.session.query(StudentModel).filter(StudentModel.phone_number == _phone_number).first()
+
+    @classmethod
+    def find_student_by_email(cls, email):
+        return db.session.query(StudentModel).filter(StudentModel.email == email).first()
+
+    def password_is_valid(self, password):
+        return Bcrypt().check_password_hash(self.password, password)
+
+    def generate_token(self, student_id):
+        try:
+            payload = {
+                'exp': datetime.utcnow() + timedelta(minutes=5),
+                'iat': datetime.utcnow(),
+                'sub': str(student_id)
+            }
+            return jwt.encode(payload=payload, key=current_app.config.get('SECRET_KEY'), algorithm='HS256')
+        except Exception as e:
+            return str(e)
+
+    @staticmethod
+    def decode_token(token):
+        try:
+            payload = jwt.decode(token, current_app.config.get('SECRET_KEY'))
+            return payload['sub']
+        except jwt.ExpiredSignatureError:
+            return "Token expired, sign in again"
+        except jwt.InvalidTokenError:
+            return "Invalid token, register or login"
 
     def save_to_db(self):
         db.session.add(self)
