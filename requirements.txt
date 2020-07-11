@@ -14,6 +14,7 @@ docutils==0.15.2
 Flask==1.1.2
 Flask-Bcrypt==0.7.1
 Flask-GraphQL==2.0.1
+Flask-JWT-Extended==3.24.1
 Flask-RESTful==0.3.8
 Flask-SQLAlchemy==2.4.3
 graphene==2.1.8
@@ -32,7 +33,6 @@ marshmallow==3.7.0
 promise==2.3
 psycopg2-binary==2.8.5
 pycparser==2.20
-PyJWT==1.7.1
 python-dateutil==2.8.1
 python-dotenv==0.13.0
 python-editor==1.0.4

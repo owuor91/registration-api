@@ -17,6 +17,7 @@ class Config(object):
     S3_ACCESS_KEY = getenv('S3_ACCESS_KEY')
     S3_SECRET_ACCESS_KEY = getenv('S3_SECRET_ACCESS_KEY')
     S3_BASE_URL = getenv('S3_BASE_URL')
+    JWT_SECRET_KEY = getenv('JWT_SECRET_KEY')
 
 
 class ProductionConfig(Config):

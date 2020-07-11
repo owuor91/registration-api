@@ -1,8 +1,5 @@
 import uuid
-from datetime import datetime, timedelta
 
-import jwt
-from flask import current_app
 from flask_bcrypt import Bcrypt
 from sqlalchemy import or_
 from sqlalchemy.dialects.postgresql import UUID
@@ -58,27 +55,6 @@ class StudentModel(Base):
 
     def password_is_valid(self, password):
         return Bcrypt().check_password_hash(self.password, password)
-
-    def generate_token(self, student_id):
-        try:
-            payload = {
-                'exp': datetime.utcnow() + timedelta(minutes=5),
-                'iat': datetime.utcnow(),
-                'sub': str(student_id)
-            }
-            return jwt.encode(payload=payload, key=current_app.config.get('SECRET_KEY'), algorithm='HS256')
-        except Exception as e:
-            raise Exception(e)
-
-    @staticmethod
-    def decode_token(token):
-        try:
-            payload = jwt.decode(token, current_app.config.get('SECRET_KEY'))
-            return payload['sub']
-        except jwt.ExpiredSignatureError:
-            return "Token expired, sign in again"
-        except jwt.InvalidTokenError:
-            return "Invalid token, register or login"
 
     def save_to_db(self):
         db.session.add(self)

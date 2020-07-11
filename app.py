@@ -1,5 +1,6 @@
 from flask import Flask
 from flask_graphql import GraphQLView
+from flask_jwt_extended import JWTManager
 from flask_restful import Api
 
 from config import DevelopmentConfig
@@ -14,6 +15,8 @@ def create_app(config):
     app = Flask(__name__)
     app.config.from_object(config)
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.config['JWT_SECRET_KEY'] = 'reallynicee38y72piebird'
+    jwt = JWTManager(app)
 
     api = Api(app)
     db.init_app(app)
