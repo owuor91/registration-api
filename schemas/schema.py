@@ -19,6 +19,7 @@ class StudentSchema(Schema):
     date_of_birth = fields.Date(required=True, error_messages={"required": "date of birth is required"})
     sex = fields.String(required=True, error_messages={"required": "sex is required"})
     image_url = fields.String(allow_none=True)
+    password = fields.String(required=True, error_messages={"required": "password is required"})
 
     @post_load
     def deserialize_student(self, data, **kwargs):
