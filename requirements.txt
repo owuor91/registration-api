@@ -2,6 +2,7 @@ africastalking==1.2.0
 alembic==1.4.2
 aniso8601==7.0.0
 bcrypt==3.1.7
+blinker==1.4
 boto3==1.14.8
 botocore==1.17.8
 Cerberus==1.3.2
@@ -33,6 +34,7 @@ marshmallow==3.7.0
 promise==2.3
 psycopg2-binary==2.8.5
 pycparser==2.20
+PyJWT==1.7.1
 python-dateutil==2.8.1
 python-dotenv==0.13.0
 python-editor==1.0.4
@@ -41,6 +43,7 @@ requests==2.24.0
 Rx==1.6.1
 s3transfer==0.3.3
 schema==0.7.2
+sentry-sdk==0.16.1
 singledispatch==3.4.0.3
 six==1.15.0
 SQLAlchemy==1.3.17
