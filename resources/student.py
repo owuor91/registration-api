@@ -1,3 +1,5 @@
+import datetime
+
 import boto3
 from flask import request
 from flask_jwt_extended import (create_access_token, jwt_required)
@@ -121,7 +123,7 @@ class StudentLogin(Resource):
         try:
             student = StudentModel.find_student_by_email(get_value('email'))
             if student and student.password_is_valid(get_value('password')):
-                access_token = create_access_token(student.student_id)
+                access_token = create_access_token(student.student_id, expires_delta=datetime.timedelta(seconds=86400))
                 if access_token:
                     response = {
                         'message': 'login successful',

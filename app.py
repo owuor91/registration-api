@@ -1,7 +1,9 @@
+import sentry_sdk
 from flask import Flask
 from flask_graphql import GraphQLView
 from flask_jwt_extended import JWTManager
 from flask_restful import Api
+from sentry_sdk.integrations.flask import FlaskIntegration
 
 from config import DevelopmentConfig
 from db import db
@@ -12,6 +14,10 @@ from resources.student_course import StudentCourse
 
 
 def create_app(config):
+    sentry_sdk.init(
+        dsn=config.SENTRY_DSN_KEY,
+        integrations=[FlaskIntegration()]
+    )
     app = Flask(__name__)
     app.config.from_object(config)
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
