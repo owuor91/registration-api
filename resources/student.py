@@ -1,5 +1,8 @@
+import datetime
+
 import boto3
 from flask import request
+from flask_jwt_extended import (create_access_token, jwt_required)
 from flask_restful import Resource
 from werkzeug.utils import secure_filename
 
@@ -41,6 +44,7 @@ class Student(Resource):
             except Exception as e:
                 return {'error': e.args}, 500
 
+    @jwt_required
     def get(self, student_id=None):
         student = students = None
         if student_id:
@@ -55,6 +59,7 @@ class Student(Resource):
             return {'students': [student_schema.dump(s) for s in students]}
         return {'message': 'student not found'}, 404
 
+    @jwt_required
     def put(self, student_id):
         student = StudentModel.find_student_by_id(student_id)
 
@@ -82,6 +87,7 @@ class Student(Resource):
         return {'message': 'student updated successfully',
                 'student': student_schema.dump(student)}
 
+    @jwt_required
     def delete(self, student_id):
         student = StudentModel.find_student_by_id(student_id)
         if student:
@@ -110,3 +116,21 @@ class Student(Resource):
         except Exception as e:
             image_errors['message'] = str(e.args)
             raise Exception(image_errors)
+
+
+class StudentLogin(Resource):
+    def post(self):
+        try:
+            student = StudentModel.find_student_by_email(get_value('email'))
+            if student and student.password_is_valid(get_value('password')):
+                access_token = create_access_token(student.student_id, expires_delta=datetime.timedelta(seconds=86400))
+                if access_token:
+                    response = {
+                        'message': 'login successful',
+                        'access_token': access_token
+                    }
+                    return response, 200
+            else:
+                return {"error": "invalid credentials"}, 401
+        except Exception as e:
+            return {'error': str(e)}, 500

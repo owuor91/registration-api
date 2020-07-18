@@ -1,4 +1,5 @@
 from flask import request
+from flask_jwt_extended import jwt_required
 from flask_restful import Resource
 
 from models.models import CourseModel
@@ -7,6 +8,7 @@ from utils.util import get_value
 
 
 class Course(Resource):
+    @jwt_required
     def post(self):
         data = request.form.to_dict(flat=True)
         course_schema = CourseSchema()
@@ -27,6 +29,7 @@ class Course(Resource):
             except Exception as e:
                 return {'error': e.args}, 500
 
+    @jwt_required
     def get(self, course_id=None):
         course = courses = None
         if course_id:
