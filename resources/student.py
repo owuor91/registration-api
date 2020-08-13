@@ -22,7 +22,7 @@ class Student(Resource):
         else:
             students = StudentModel.return_all()
 
-        student_schema = StudentSchema()
+        student_schema = StudentSchema(exclude=['password', 'sex', 'date_of_birth'])
         if student:
             return {'student': student_schema.dump(student)}
         elif students:
@@ -68,7 +68,6 @@ class Student(Resource):
             return {'message': 'student with id {} doesn\'t exist'.format(student_id)}
 
 
-
 class StudentLogin(Resource):
     def post(self):
         try:
@@ -88,7 +87,7 @@ class StudentLogin(Resource):
 
 
 class StudentRegistration(Resource):
-    def post(self, image=None, sex=None):
+    def post(self, image=None, sex=None, date_of_birth=None):
         data = request.form.to_dict(flat=True)
         student_schema = StudentSchema()
         errors = student_schema.validate(data)
@@ -98,6 +97,9 @@ class StudentRegistration(Resource):
         data["image_url"] = ""
         if sex is None:
             data["sex"] = ""
+
+        if date_of_birth is None:
+            data["date_of_birth"] = datetime.date.today().strftime("%m-%d-%Y")
 
         new_student = student_schema.load(data)
 
@@ -117,7 +119,7 @@ class StudentRegistration(Resource):
             try:
                 new_student.save_to_db()
                 saved_student = StudentModel.find_student_by_phone_number(request_phone_number)
-                student_schema = StudentSchema(exclude=['password', 'sex'])
+                student_schema = StudentSchema(exclude=['password', 'sex', 'date_of_birth'])
                 return {'message': 'student registration, successful',
                         'student': student_schema.dump(saved_student)}, 201
             except Exception as e:
