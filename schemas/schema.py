@@ -16,8 +16,8 @@ class StudentSchema(Schema):
     email = fields.Email(required=True, error_messages={"required": "email is required"})
     phone_number = fields.String(required=True, validate=Length(min=10),
                                  error_messages={"required": "phone number is required"})
-    date_of_birth = fields.Date(required=True, error_messages={"required": "date of birth is required"})
-    sex = fields.String(required=True, error_messages={"required": "sex is required"})
+    date_of_birth = fields.String(required=True, error_messages={"required": "date of birth is required"})
+    sex = fields.String(allow_none=True)
     image_url = fields.String(allow_none=True)
     password = fields.String(required=True, error_messages={"required": "password is required"})
 
