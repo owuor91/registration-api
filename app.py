@@ -37,6 +37,7 @@ def create_app(config):
 
     app.add_url_rule('/graphql', view_func=GraphQLView.as_view('graphql', schema=schema, graphiql=True,
                                                                get_context=lambda: {'session': db.session}))
+    jwt._set_error_handler_callbacks(api)
     return app
 
 
