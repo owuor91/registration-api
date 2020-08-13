@@ -13,36 +13,6 @@ from utils.util import get_value
 
 
 class Student(Resource):
-    def post(self, image=None):
-        data = request.form.to_dict(flat=True)
-        student_schema = StudentSchema()
-        errors = student_schema.validate(data)
-        if errors:
-            return {'error': True, 'errors': str(errors)}, 400
-
-        data["image_url"] = ""
-        new_student = student_schema.load(data)
-
-        request_phone_number = new_student.phone_number
-
-        if StudentModel.find_student_by_phone_number(request_phone_number):
-            return {'message': 'a student with the number {} already exists'.format(request_phone_number)}, 400
-        else:
-            image_file = request.files.get('image')
-            if image_file:
-                try:
-                    image_url = self.upload_image_to_s3(image_file)
-                    new_student.image_url = image_url
-                except Exception as e:
-                    return {'error': True, 'errors': e.args}, 400
-
-            try:
-                new_student.save_to_db()
-                saved_student = StudentModel.find_student_by_phone_number(request_phone_number)
-                return {'message': 'student registration, successful',
-                        'student': student_schema.dump(saved_student)}, 201
-            except Exception as e:
-                return {'error': e.args}, 500
 
     @jwt_required
     def get(self, student_id=None):
@@ -97,6 +67,62 @@ class Student(Resource):
         else:
             return {'message': 'student with id {} doesn\'t exist'.format(student_id)}
 
+
+
+class StudentLogin(Resource):
+    def post(self):
+        try:
+            student = StudentModel.find_student_by_email(get_value('email'))
+            if student and student.password_is_valid(get_value('password')):
+                access_token = create_access_token(student.student_id, expires_delta=datetime.timedelta(seconds=86400))
+                if access_token:
+                    response = {
+                        'message': 'login successful',
+                        'access_token': access_token
+                    }
+                    return response, 200
+            else:
+                return {"error": "invalid credentials"}, 401
+        except Exception as e:
+            return {'error': str(e)}, 500
+
+
+class StudentRegistration(Resource):
+    def post(self, image=None, sex=None):
+        data = request.form.to_dict(flat=True)
+        student_schema = StudentSchema()
+        errors = student_schema.validate(data)
+        if errors:
+            return {'error': True, 'errors': str(errors)}, 400
+
+        data["image_url"] = ""
+        if sex is None:
+            data["sex"] = ""
+
+        new_student = student_schema.load(data)
+
+        request_phone_number = new_student.phone_number
+
+        if StudentModel.find_student_by_phone_number(request_phone_number):
+            return {'message': 'a student with the number {} already exists'.format(request_phone_number)}, 400
+        else:
+            image_file = request.files.get('image')
+            if image_file:
+                try:
+                    image_url = self.upload_image_to_s3(image_file)
+                    new_student.image_url = image_url
+                except Exception as e:
+                    return {'error': True, 'errors': e.args}, 400
+
+            try:
+                new_student.save_to_db()
+                saved_student = StudentModel.find_student_by_phone_number(request_phone_number)
+                student_schema = StudentSchema(exclude=['password', 'sex'])
+                return {'message': 'student registration, successful',
+                        'student': student_schema.dump(saved_student)}, 201
+            except Exception as e:
+                return {'error': e.args}, 500
+
     def upload_image_to_s3(self, image_file):
         img_file_name = secure_filename(image_file.filename)
 
@@ -116,21 +142,3 @@ class Student(Resource):
         except Exception as e:
             image_errors['message'] = str(e.args)
             raise Exception(image_errors)
-
-
-class StudentLogin(Resource):
-    def post(self):
-        try:
-            student = StudentModel.find_student_by_email(get_value('email'))
-            if student and student.password_is_valid(get_value('password')):
-                access_token = create_access_token(student.student_id, expires_delta=datetime.timedelta(seconds=86400))
-                if access_token:
-                    response = {
-                        'message': 'login successful',
-                        'access_token': access_token
-                    }
-                    return response, 200
-            else:
-                return {"error": "invalid credentials"}, 401
-        except Exception as e:
-            return {'error': str(e)}, 500
