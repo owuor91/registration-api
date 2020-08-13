@@ -29,14 +29,6 @@ target_metadata = Base.metadata
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
 
-cmd_kwargs = context.get_x_argument(as_dictionary=True)
-if 'db' not in cmd_kwargs:
-    raise Exception('We couldn\'t find `db` in the CLI arguments. '
-                    'Please verify `alembic` was run with `-x db=<db_name>` '
-                    '(e.g. `alembic -x db=development upgrade head`)')
-db_name = cmd_kwargs['db']
-
-
 def run_migrations_offline():
     """Run migrations in 'offline' mode.
 
@@ -68,12 +60,11 @@ def run_migrations_online():
     and associate a connection with the context.
 
     """
-    alembic_config = config.get_section(config.config_ini_section)
-    db_config = config.get_section(db_name)
-    for key in db_config:
-        alembic_config[key] = db_config[key]
-
-    connectable = engine_from_config(alembic_config, prefix='sqlalchemy.', poolclass=pool.NullPool)
+    connectable = engine_from_config(
+        config.get_section(config.config_ini_section),
+        prefix="sqlalchemy.",
+        poolclass=pool.NullPool,
+    )
 
     with connectable.connect() as connection:
         context.configure(
