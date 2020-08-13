@@ -3,4 +3,5 @@ from config import ProductionConfig
 from db import db
 
 app = create_app(ProductionConfig)
-db.create_all(app)
+with app.app_context():
+    db.create_all()
