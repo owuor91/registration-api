@@ -16,7 +16,7 @@ Supported functionality:
 
 EXAMPLE:
 ```
-http --form POST https://courses-service.herokuapp.com/register first_name="Cate" last_name="Ajab" phone_number="0700000001" email="cate@ajab.com" date_of_birth="05-16-2000" password="cate_ajab"
+http --form POST https://courses-service.herokuapp.com/register first_name="Cate" last_name="Ajab" phone_number="0700000001" email="cate@ajab.com" password="cate_ajab"
 ```
 
 Response:
@@ -46,7 +46,8 @@ Response:
 ```
 {
     "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1OTczMjYzNDAsIm5iZiI6MTU5NzMyNjM0MCwianRpIjoiNjlhODU2MmYtM2E0OC00ODU1LTkwMTUtNjM4MTI2NDg5NDBkIiwiZXhwIjoxNTk3NDEyNzQwLCJpZGVudGl0eSI6ImI4ZGE4MDdhLTUxMTctNDI3OC1iOTkzLWRlZjk2ZTYyZTJjYSIsImZyZXNoIjpmYWxzZSwidHlwZSI6ImFjY2VzcyJ9.YkxstC33kqlhzn57UqCAZHU8f0wcFVMHjgYNrHI6qLc",
-    "message": "login successful"
+    "message": "login successful",
+    "student_id": "b8da807a-5117-4278-b993-def96e62e2ca"
 }
 ```
 
