@@ -77,7 +77,8 @@ class StudentLogin(Resource):
                 if access_token:
                     response = {
                         'message': 'login successful',
-                        'access_token': access_token
+                        'access_token': access_token,
+                        'student_id': str(student.student_id)
                     }
                     return response, 200
             else:
