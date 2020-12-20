@@ -1,13 +1,28 @@
-version: '3.6'
+version: '3.7'
 
 services:
+  db:
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: registration_dev
+      POSTGRES_HOST: localhost
+    image: postgres
+    expose:
+      - 5432
+    networks:
+      - default
+    restart: always
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
   api:
     build: .
     depends_on:
       - db
     environment:
-      STAGE: test
-      SQLALCHEMY_DATABASE_URI: postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db/${POSTGRES_DATABASE}
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: password
     networks:
       - default
     ports:
@@ -17,17 +32,5 @@ services:
       - ./migrations:/usr/src/app/migrations
     restart: always
 
-  db:
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DATABASE}
-      POSTGRES_HOST: localhost
-    image: postgres:latest
-    networks:
-      - default
-#    ports:
-#      - 5432:5432
-    restart: always
-    volumes:
-      - ./postgres-data:/var/lib/postgresql/data
+volumes:
+  pgdata:

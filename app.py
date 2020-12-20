@@ -44,4 +44,4 @@ def create_app(config):
 
 
 if __name__ == '__main__':
-    create_app(DevelopmentConfig).run(port=5000, debug=True)
+    create_app(DevelopmentConfig).run(host='0.0.0.0', port=5000, debug=True)

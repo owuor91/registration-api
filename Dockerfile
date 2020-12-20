@@ -6,4 +6,6 @@ WORKDIR /app
 RUN pip install -r requirements.txt
 ENV FLASK_ENV="docker"
 EXPOSE 5000
-ENTRYPOINT ["python", "app.py"]
+COPY ./docker-entrypoint.sh /docker-entrypoint.sh
+RUN chmod +x /docker-entrypoint.sh
+ENTRYPOINT ["/docker-entrypoint.sh"]
